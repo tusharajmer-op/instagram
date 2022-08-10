@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:instagram/utils/errorhandler.dart';
 import 'package:instagram/utils/roots.dart';
 
 import '../widgets/Buttons.dart';
@@ -38,12 +39,20 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     datamaker(context) {
-      roots().ProfilePicture(context, [{
-        "Username": _username.text,
-        "Email": _email.text,
-        "Password": _password.text,
-        "confirm Password": _confirmpassword.text,
-      }]);
+      if (_password.text != _confirmpassword.text ||
+          _password.text == "" ||
+          _confirmpassword.text == "") {
+        CustomError().passwordDoesnotMatchError(context);
+      } else {
+        roots().ProfilePicture(context, [
+          {
+            "Username": _username.text,
+            "Email": _email.text,
+            "Password": _password.text,
+            "confirm Password": _confirmpassword.text,
+          }
+        ]);
+      }
     }
 
     roots root = roots();
@@ -90,22 +99,13 @@ class _SignupState extends State<Signup> {
                     flex: 2,
                     child: Mybuttons(
                       texts: "Need help?",
-                      func: root.signup,
+                      func: CustomError().passwordDoesnotMatchError,
                       bclr: Colors.white,
                       clr: Colors.black,
                     )),
-                MaterialButton(
-                  onPressed: () {
-                    print(_username.text);
-                  },
-                  child: Text("show username"),
-                ),
                 Flexible(
                   flex: 1,
-                  child: Mybuttons(
-                    texts: "next",
-                    func: datamaker,
-                  ),
+                  child: Mybuttons(texts: "next", func: datamaker),
                 ),
               ],
             )

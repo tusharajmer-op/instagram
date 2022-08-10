@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/screens/Sign_up.dart';
+import 'package:instagram/utils/errorhandler.dart';
+import 'package:instagram/widgets/MyAlertBox.dart';
 import 'package:instagram/widgets/MyTextField.dart';
 import '../utils/database.dart';
 
@@ -47,9 +49,11 @@ class _ProfilePictureState extends State<ProfilePicture> {
   @override
   Widget build(BuildContext context) {
     var data = ModalRoute.of(context)!.settings.arguments as List;
-    datamaker(context) {
-      DataBase()
-          .SignUpUsers(context, [{"data": data, "bio": _bio.text, "dob": _Birthdate.text}]);
+    datamaker(context){
+      
+      DataBase().SignUpUsers(context, [
+        {"data": data, "bio": _bio.text, "dob": _Birthdate.text}
+      ]);
     }
 
     print(data[0]['Username']);
