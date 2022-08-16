@@ -1,19 +1,13 @@
 // ignore_for_file: file_names, avoid_print
-
-import 'dart:convert';
-import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:instagram/screens/Sign_up.dart';
-import 'package:instagram/utils/errorhandler.dart';
-import 'package:instagram/widgets/MyAlertBox.dart';
 import 'package:instagram/widgets/MyTextField.dart';
 import '../utils/database.dart';
-
 import '../utils/roots.dart';
 import '../widgets/Buttons.dart';
+import '../widgets/MyAlertBox.dart';
 
 class ProfilePicture extends StatefulWidget {
   const ProfilePicture({Key? key}) : super(key: key);
@@ -28,7 +22,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
   late TextEditingController _Birthdate = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String nimage = "https://i.stack.imgur.com/l60Hf.png";
-  Uint8List? _im;
+  Uint8List? _im = Uint8List(0);
   roots root = roots();
 
   @override
@@ -40,23 +34,57 @@ class _ProfilePictureState extends State<ProfilePicture> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _bio.dispose();
     _Birthdate.dispose();
   }
 
+  static bool loader = false;
+
   @override
+  addDialoge(context, String res) {
+    if (res == "User Created") {
+      roots.HomePage(context);
+    } else {
+      MyAlertBox().MyalertBox(context, "Error ", "er");
+      roots.HomePage(context);
+    }
+  }
+
+  startloader() {
+    setState(() {
+      loader = true;
+    });
+  }
+
+  stoploader() async {
+    setState(() {
+      loader = false;
+    });
+    addDialoge(context, "hello");
+  }
+
   Widget build(BuildContext context) {
     var data = ModalRoute.of(context)!.settings.arguments as List;
-    datamaker(context){
-      
-      DataBase().SignUpUsers(context, [
-        {"data": data, "bio": _bio.text, "dob": _Birthdate.text}
+
+    datamaker(context) async {
+      // MyAlertBox().MyalertBox(context, "Error ", "er");
+      startloader();
+
+      String res = await DataBase().SignUpUsers([
+        {
+          "data": data,
+          "bio": _bio.text,
+          "dob": _Birthdate.text,
+          "Profile_Picture": (_im!.isNotEmpty) ? _im : nimage,
+        }
       ]);
+      // MyAlertBox().MyalertBox(context, "Errorss ", "er");
+      stoploader();
+      // MyAlertBox().MyalertBox(context, "Error ", "er");
+      // addDialoge(context, res);
     }
 
-    print(data[0]['Username']);
     return Scaffold(
       body: SafeArea(
           child: Column(
@@ -68,7 +96,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
           ),
           SizedBox(
             child: Stack(children: [
-              _im != null
+              (_im!.isNotEmpty)
                   ? CircleAvatar(
                       radius: 60,
                       backgroundImage: MemoryImage(_im!),
@@ -117,10 +145,16 @@ class _ProfilePictureState extends State<ProfilePicture> {
                   )),
               Flexible(
                 flex: 1,
-                child: Mybuttons(
-                  texts: "sign up",
-                  func: datamaker,
-                ),
+                child: loader
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        backgroundColor: Colors.blue,
+                        color: Colors.white,
+                      ))
+                    : Mybuttons(
+                        texts: "sign up",
+                        func: datamaker,
+                      ),
               ),
             ],
           )

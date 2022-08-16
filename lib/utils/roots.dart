@@ -17,7 +17,7 @@ class roots {
     Navigator.pushNamed(context, "/ProfilePictureSelect", arguments: data);
   }
 
-  HomePage(context) {
-    Navigator.pushNamed(context, "/homepage");
+  static HomePage(context) {
+    Navigator.pushReplacementNamed(context, "/homepage");
   }
 }
